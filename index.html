@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="实时追踪 Hyperliquid 上 SKHX 与 SKHY 的价格、溢价和历史价差。">
+  <meta name="theme-color" content="#070a09">
+  <title>SKHY 实时溢价 | Hyperliquid</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span><div><strong>SKHY BASIS</strong><span>Hyperliquid 溢价监控</span></div></div>
+    <div id="connection" class="connection connecting"><span class="pulse"></span><span>正在连接</span></div>
+  </header>
+
+  <main class="shell">
+    <section class="intro">
+      <div><p class="kicker">● LIVE SPREAD MONITOR</p><h1>SK 海力士双市场溢价</h1><p>比较 Hyperliquid 上韩国普通股敞口 SKHX（旧称 SKHYNIX）与美股 ADS 敞口 SKHY。</p></div>
+      <a href="https://app.hyperliquid.xyz/" target="_blank" rel="noreferrer">打开 Hyperliquid ↗</a>
+    </section>
+
+    <div id="error" class="error" role="status" hidden></div>
+
+    <section class="premium-panel" aria-label="当前实时溢价">
+      <div class="premium-main">
+        <div class="label">实时中间价溢价 <button class="info" title="公式：10 × SKHY ÷ SKHX − 1" aria-label="查看计算方式">i</button></div>
+        <div id="premium" class="premium-value" aria-live="polite">—</div>
+        <div class="premium-foot"><span id="zone" class="zone neutral">等待行情</span><span id="premium-change">—</span></div>
+      </div>
+      <div class="formula">
+        <span>当前换算</span><code id="formula-top">10 × $—</code><i></i><code id="formula-bottom">$—</code><strong id="formula-result">= —</strong><small>按两边实时中间价计算</small>
+      </div>
+      <div class="rail">
+        <div class="hot"><span>45%+</span><b>高溢价</b></div><div class="neutral"><span>35–45%</span><b>中性</b></div><div class="cool"><span>&lt;35%</span><b>低于中枢</b></div><em id="rail-marker" hidden>—</em>
+      </div>
+    </section>
+
+    <section class="market-grid" aria-label="合约报价">
+      <article class="market-card mint">
+        <div class="market-head"><div><p>HYPERLIQUID · XYZ</p><h2>SKHYNIX / SKHX</h2><span>xyz:SKHX</span></div><b id="skhx-change">—</b></div>
+        <div class="market-price"><small>$</small><span id="skhx-mid">—</span></div>
+        <div class="metrics"><div><span>标记价</span><strong id="skhx-mark">—</strong></div><div><span>预言机价</span><strong id="skhx-oracle">—</strong></div><div><span>每小时资金费率</span><strong id="skhx-funding">—</strong></div><div><span>24h 成交额</span><strong id="skhx-volume">—</strong></div></div>
+      </article>
+      <article class="market-card blue">
+        <div class="market-head"><div><p>HYPERLIQUID · XYZ</p><h2>SKHY ADS</h2><span>xyz:SKHY</span></div><b id="skhy-change">—</b></div>
+        <div class="market-price"><small>$</small><span id="skhy-mid">—</span></div>
+        <div class="metrics"><div><span>标记价</span><strong id="skhy-mark">—</strong></div><div><span>预言机价</span><strong id="skhy-oracle">—</strong></div><div><span>每小时资金费率</span><strong id="skhy-funding">—</strong></div><div><span>24h 成交额</span><strong id="skhy-volume">—</strong></div></div>
+      </article>
+    </section>
+
+    <section class="chart-panel">
+      <div class="chart-head"><div><span>历史溢价</span><h2 id="chart-title">7D 价差轨迹</h2></div><div class="ranges" role="group" aria-label="选择历史区间"><button data-range="1D">1D</button><button class="active" data-range="7D">7D</button><button data-range="30D">30D</button><button data-range="90D">90D</button></div></div>
+      <div class="chart-stats"><span>均值 <b id="average">—</b></span><span>区间 <b id="range-min">—</b> — <b id="range-max">—</b></span><span>样本 <b id="sample-count">0</b></span></div>
+      <div id="chart-wrap" class="chart-wrap"><canvas id="chart" aria-label="历史溢价折线图"></canvas><div id="chart-loading" class="chart-loading">正在读取历史行情</div><div id="chart-tooltip" class="chart-tooltip" hidden></div></div>
+    </section>
+
+    <footer><div><strong>口径说明</strong><p>SKHX 是韩国普通股 000660 的美元化永续合约，SKHY 是美股 ADS 永续合约；10 份 ADS 对应 1 股普通股。溢价使用两份 Hyperliquid 合约的中间价直接计算，不额外叠加汇率。</p></div><div><span>最后更新</span><strong id="updated-at">—</strong><small>数据源：Hyperliquid 官方 API · 仅供信息参考</small></div></footer>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+</html>
