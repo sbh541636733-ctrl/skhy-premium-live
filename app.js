@@ -1,4 +1,4 @@
-import {EXCHANGES,RANGES,positive,premium,catalog,ticker,details,candles,matchHistory,stream} from './adapters.js?v=6';
+import {EXCHANGES,RANGES,positive,premium,catalog,ticker,details,candles,matchHistory,stream} from './adapters.js?v=7';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=(v,d)=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:d??(v>=1?2:4),maximumFractionDigits:d??(v>=100?2:v>=1?4:8)}):'—';
 const pct=v=>Number.isFinite(v)?`${v>=0?'+':''}${v.toFixed(3)}%`:'—';

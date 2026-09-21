@@ -4,7 +4,7 @@ export const RANGES = {'1D':{days:1,interval:'5m',ms:300000},'7D':{days:7,interv
 const roots={hl:'https://api.hyperliquid.xyz',okx:'https://www.okx.com',bn:'https://api.binance.com',gate:'https://api.gateio.ws',bybit:'https://api.bybit.com',bitget:'https://api.bitget.com'};
 export const positive=v=>v!==''&&v!=null&&Number.isFinite(+v)&&+v>0?+v:NaN;
 export function premium(a,b,ratio=1,fx=1){return [a,b,ratio,fx].every(x=>Number.isFinite(x)&&x>0)?(b*ratio*fx/a-1)*100:NaN}
-export async function json(url,body){const c=new AbortController(),t=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal,cache:'no-store',...(body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{})});if(!r.ok)throw Error(`HTTP ${r.status}`);const d=await r.json();if(d.code!=null&&!['0','00000'].includes(String(d.code)))throw Error(d.msg||d.message||`API ${d.code}`);if(d.retCode)throw Error(d.retMsg||`API ${d.retCode}`);return d}finally{clearTimeout(t)}}
+export async function json(url,body){const c=new AbortController(),t=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal,cache:'no-store',...(body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{})});if(!r.ok)throw Error(`HTTP ${r.status}`);const d=await r.json();if(d.code!=null&&!['0','00000'].includes(String(d.code)))throw Error(d.msg||d.message||`API ${d.code}`);if(d.retCode)throw Error(d.retMsg||`API ${d.retCode}`);return d}catch(e){if(e.name==='AbortError')throw Error('请求超时（12 秒）');if(e instanceof TypeError)throw Error('无法连接行情接口，请检查网络或地区限制');throw e}finally{clearTimeout(t)}}
 const info=body=>json(roots.hl+'/info',body);
 const url=(e,path,p={})=>roots[e]+path+'?'+new URLSearchParams(p);
 const get=(e,path,p)=>json(url(e,path,p));
@@ -15,7 +15,7 @@ export async function catalog(exchange,type){const key=exchange+type;if(memo.has
 async function loadCatalog(e,type){const spot=type==='spot';
  if(e==='hl'){
   if(spot){const d=await info({type:'spotMeta'}),tokens=new Map(d.tokens.map(x=>[x.index,x]));return d.universe.flatMap(x=>{const b=tokens.get(x.tokens[0]),q=tokens.get(x.tokens[1]);return b&&q&&['USDC','USDT','USDH'].includes(q.name)?[m(e,type,x.name,b.name,q.name)]:[]})}
-  const metas=await info({type:'allPerpMetas'});return metas.flatMap(d=>d.universe.filter(x=>!x.isDelisted).map(x=>m(e,type,x.name,x.name.split(':').pop(),'USD',{dex:x.name.includes(':')?x.name.split(':')[0]:''})));
+  const metas=await info({type:'allPerpMetas'});return metas.map(d=>Array.isArray(d)?d[0]:d).flatMap(d=>d.universe.filter(x=>!x.isDelisted).map(x=>m(e,type,x.name,x.name.split(':').pop(),'USD',{dex:x.name.includes(':')?x.name.split(':')[0]:''})));
  }
  if(e==='bn'){const d=await bin(type,'exchangeInfo',{});return d.symbols.filter(x=>x.status==='TRADING'&&['USDT','USDC'].includes(x.quoteAsset)&&(spot||x.contractType==='PERPETUAL')).map(x=>m(e,type,x.symbol,x.baseAsset,x.quoteAsset))}
  if(e==='okx'){const d=await get(e,'/api/v5/public/instruments',{instType:spot?'SPOT':'SWAP'});return d.data.filter(x=>x.state==='live'&&['USDT','USDC'].includes(spot?x.quoteCcy:x.settleCcy)&& (spot||x.ctType==='linear')).map(x=>m(e,type,x.instId,spot?x.baseCcy:x.ctValCcy,spot?x.quoteCcy:x.settleCcy))}
